@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass
 from datetime import date
 
-from .config import IT_KEYWORDS, IT_ONLY_CATEGORIES
+from .config import IT_KEYWORDS, IT_ONLY_CATEGORIES, MIXED_KEYWORDS
 from .models import Listing
 
 _ASCII = re.compile(r"[a-z]+")
@@ -23,6 +23,7 @@ def _keyword_pattern(words: list[str]) -> re.Pattern:
 
 
 _IT_PATTERN = _keyword_pattern(IT_KEYWORDS)
+_MIXED_PATTERN = _keyword_pattern(MIXED_KEYWORDS)
 
 
 def is_it_related(listing: Listing) -> bool:
@@ -31,6 +32,11 @@ def is_it_related(listing: Listing) -> bool:
     cats = set(listing.categories)
     # "기타"만 있는 건 근거가 부족하므로 제외
     return bool(cats) and cats <= IT_ONLY_CATEGORIES and cats != {"기타"}
+
+
+def is_mixed_related(listing: Listing) -> bool:
+    """제목에 비IT 전문 분야(금융·경영·디자인 등)가 함께 보이는지. IT 판정과 겹치면 두 트랙 모두에 보낸다."""
+    return bool(_MIXED_PATTERN.search(listing.title))
 
 
 def is_open(listing: Listing, today: date) -> bool:
@@ -49,7 +55,11 @@ def title_keys(title: str) -> set[str]:
     두 가지를 만들고, 하나라도 겹치면 같은 공모전으로 본다.
     """
     t = title.lower()
-    return {k for k in (_NON_WORD.sub("", _BRACKETS.sub("", t)), _NON_WORD.sub("", t)) if k}
+    keys = {_NON_WORD.sub("", t)}
+    stripped = _BRACKETS.sub("", t)
+    if len(_core(stripped)) >= 2:  # 괄호를 빼면 '참가자모집' 같은 꼬리말만 남는 제목은 이 키를 쓰지 않는다
+        keys.add(_NON_WORD.sub("", stripped))
+    return {k for k in keys if k}
 
 
 _YEAR = re.compile(r"(19|20)\d{2}년?|제?\d+(회|기|차)")
@@ -60,6 +70,11 @@ _ORG_SUFFIX = re.compile(r"(주식회사|\(주\)|㈜|재단법인|사단법인|\
 
 def _norm(text: str) -> str:
     return _NON_WORD.sub("", text.lower())
+
+
+def _core(text: str) -> str:
+    """연도·회차·'공모전' 같은 꼬리말을 뺀 핵심 제목."""
+    return _NON_WORD.sub("", _GENERIC.sub("", _YEAR.sub("", text)))
 
 
 def _bigrams(s: str) -> set[str]:
@@ -86,7 +101,11 @@ class Fingerprint:
            source: str | None = None) -> "Fingerprint":
         t = title.lower()
         brackets = [_norm(_ORG_SUFFIX.sub("", m.group()[1:-1])) for m in _BRACKETS.finditer(t)]
-        core = _NON_WORD.sub("", _GENERIC.sub("", _YEAR.sub("", _BRACKETS.sub("", t))))
+        core = _core(_BRACKETS.sub("", t))
+        if len(core) < 2:
+            # "[2026 서울관광 프롬프톤] 참가자모집"처럼 괄호 안이 제목 본체인 경우: 괄호를 벗겨 다시 만든다
+            core = _core(re.sub(r"[\[\]\(\)【】<>（）]", " ", t))
+            brackets = [b for b in brackets if b != _norm(t) and not core.startswith(_core(b))]
         hosts = {h for h in [_norm(_ORG_SUFFIX.sub("", host or "")), *brackets] if len(h) >= 2}
         return cls(frozenset(title_keys(title)), core, frozenset(hosts), apply_end, source)
 

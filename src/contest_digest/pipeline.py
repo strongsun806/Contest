@@ -32,6 +32,7 @@ class Mark:
     apply_end: date | None = None
     status: str = "skipped"  # sent · skipped · pending
     moved: bool = False  # 상세를 보고 다른 트랙으로 옮긴 건
+    both: bool = False  # 융합 공모전: 이 트랙에서 보낸 뒤 다른 트랙에도 보낸다
 
 
 @dataclass
@@ -104,7 +105,9 @@ def duplicate_pending(state: State) -> set[str]:
     known = [fp for k, fp in fps.items() if state.items[k].get("status") != PENDING]
     dup = set()
     for key in sorted(k for k in fps if state.items[k].get("status") == PENDING):
-        if any(is_same_contest(fps[key], k) for k in known):
+        if state.sent_in(key):  # 융합 공모전이 다른 트랙 차례를 기다리는 중. 그 사이 생긴 중복과 비교하지 않는다
+            known.append(fps[key])
+        elif any(is_same_contest(fps[key], k) for k in known):
             dup.add(key)
         else:
             known.append(fps[key])
@@ -125,8 +128,9 @@ def classify_new(settings: Settings, http: HttpClient, state: State, today: date
     result.verdicts = classifier.classify(new) if classifier else classify_by_keyword(new)
     result.titles = {it.key: it.title for it in new}
     for listing in new:
+        v = result.verdicts[listing.key]
         state.mark(listing.key, today, listing.apply_end, None, title=listing.title,
-                   is_it=result.verdicts[listing.key].is_it, status=PENDING, listing=listing)
+                   is_it=v.is_it, status=PENDING, listing=listing, both=v.both)
     for src, err in result.failures.items():
         log.warning("소스 수집 실패 %s: %s", src, err)
     log.info("수집 %d건 → 신규 %d건 (IT %d, Non-IT %d)", result.collected, len(new), result.it, result.non_it)
@@ -173,11 +177,17 @@ def process(settings: Settings, http: HttpClient, state: State, today: date, tra
             result.marks.append(Mark(listing, is_it, end))
             continue
         contest = extractor.extract(detail, today) if extractor else metadata_only(detail)
-        if not state.was_moved(listing.key) and _detail_says_other_track(contest, is_it):
-            # 상세를 보고 나서야 다른 트랙으로 드러난 경우 넘긴다. 한 번 옮긴 건은 다시 옮기지 않아 왕복을 막는다
-            log.info("%s 트랙 이동 (%s → %s): %s", listing.key, track, "non-it" if is_it else "it", listing.title[:40])
-            result.marks.append(Mark(listing, not is_it, end, PENDING, moved=True))
-            continue
+        both = state.is_both(listing.key)
+        if not both and not state.was_moved(listing.key) and _detail_says_other_track(contest, is_it):
+            if not is_it or contest.is_it:
+                # 목록 판정과 상세 판정이 엇갈리는 애매한 건: 이 트랙에서 보내고 다른 트랙에도 보낸다
+                log.info("%s 융합/애매로 두 트랙 발송: %s", listing.key, listing.title[:40])
+                both = True
+            else:
+                # 상세를 보고 나서야 분명한 비IT로 드러난 경우 넘긴다. 한 번 옮긴 건은 다시 옮기지 않아 왕복을 막는다
+                log.info("%s 트랙 이동 (%s → %s): %s", listing.key, track, "non-it" if is_it else "it", listing.title[:40])
+                result.marks.append(Mark(listing, not is_it, end, PENDING, moved=True))
+                continue
         if not contest.is_competition:
             # 상세를 보고 단발성 대회·보상 기준에 맞지 않는 모집으로 드러난 경우
             log.info("%s 공모전 아님으로 제외: %s", listing.key, listing.title[:40])
@@ -185,7 +195,7 @@ def process(settings: Settings, http: HttpClient, state: State, today: date, tra
             result.marks.append(Mark(listing, is_it, end))
             continue
         result.contests.append(contest)
-        result.marks.append(Mark(listing, is_it, end, "sent"))
+        result.marks.append(Mark(listing, is_it, end, "sent", both=both))
 
     result.title = title(result.contests, today, track)
     result.body = render(result.contests, today, settings.urgent_days, track, result.excluded)
@@ -205,4 +215,9 @@ def save_marks(state: State, result: RunResult, today: date, issue: int | None) 
         sent = m.status == "sent"
         state.mark(m.listing.key, today, m.apply_end, issue if sent else None, title=m.listing.title, host=m.listing.host,
                    is_it=m.is_it, status=m.status if not sent or issue else PENDING, listing=m.listing,
-                   moved=m.moved)
+                   moved=m.moved, both=m.both)
+        other = "non-it" if m.is_it else "it"
+        if sent and issue and m.both and other not in state.sent_in(m.listing.key):
+            # 융합 공모전: 다른 트랙 대기열에 넣는다. moved로 표시해 그 트랙에서 다시 되돌리지 않게 한다
+            state.mark(m.listing.key, today, m.apply_end, None, title=m.listing.title, host=m.listing.host,
+                       is_it=not m.is_it, status=PENDING, listing=m.listing, moved=True)

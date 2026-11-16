@@ -222,7 +222,7 @@ def test_non_it_track_promotes_once_when_detail_says_it(http, today):
         def extract(self, detail, today):
             c = metadata_only(detail)
             k = detail.listing.key
-            # 900001: 상세상 AI 과제 해결형 → IT로 이동 / 900002: 이름에만 AI(명칭 공모) → 이동 안 함
+            # 900001: 상세상 AI 과제 해결형 → 판정이 엇갈려 두 트랙 발송 / 900002: 이름에만 AI(명칭 공모) → 이 트랙만
             c.is_it, c.category = {"wevity:900001": (True, "AI/데이터"),
                                    "wevity:900002": (True, "기획/마케팅")}.get(k, (False, "디자인/영상"))
             return c
@@ -230,10 +230,10 @@ def test_non_it_track_promotes_once_when_detail_says_it(http, today):
     state = State()
     _pending_non_it(state, today, "900001", "900002")
     r = process(Settings(), http, state, today, "non-it", use_llm=False, extractor=FakeExtractor())
-    assert [c.key for c in r.contests] == ["wevity:900002"] and r.moved == 1
+    assert [c.key for c in r.contests] == ["wevity:900001", "wevity:900002"] and r.moved == 0
     save_marks(state, r, today, issue=2)
     assert [it.key for it in state.pending(True)] == ["wevity:900001"]
-    assert state.was_moved("wevity:900001")
+    assert state.was_moved("wevity:900001") and state.sent_in("wevity:900001") == ["non-it"]
 
     # IT 트랙에서 상세가 비IT로 보여도 이미 한 번 옮긴 건은 되돌리지 않는다
     class NonItExtractor:
@@ -244,6 +244,26 @@ def test_non_it_track_promotes_once_when_detail_says_it(http, today):
 
     r2 = process(Settings(), http, state, today, "it", use_llm=False, extractor=NonItExtractor())
     assert [c.key for c in r2.contests] == ["wevity:900001"] and r2.moved == 0
+    save_marks(state, r2, today, issue=7)
+    assert state.sent_in("wevity:900001") == ["non-it", "it"] and state.pending() == []
+
+
+def test_mixed_contest_sent_to_both_tracks(http, today):
+    """융합 공모전(예: AI 재무설계 콘테스트)은 IT 트랙에서 보낸 뒤 Non-IT 트랙에도 보낸다."""
+    from contest_digest.models import Listing
+    from contest_digest.pipeline import save_marks
+
+    state = State()
+    it = Listing("wevity", "900001", "AI 재무설계 콘테스트", "https://www.wevity.com/?c=find&s=1&gbn=view&ix=900001")
+    state.mark(it.key, today, None, None, title=it.title, is_it=True, status="pending", listing=it, both=True)
+    r = process(Settings(), http, state, today, "it", use_llm=False)
+    assert [c.key for c in r.contests] == ["wevity:900001"]
+    save_marks(state, r, today, issue=1)
+    assert [x.key for x in state.pending(False)] == ["wevity:900001"]
+    r2 = process(Settings(), http, state, today, "non-it", use_llm=False)
+    assert [c.key for c in r2.contests] == ["wevity:900001"]
+    save_marks(state, r2, today, issue=2)
+    assert state.pending() == [] and state.sent_in(it.key) == ["it", "non-it"]
 
 
 def test_keyword_rule_knows_ax():
