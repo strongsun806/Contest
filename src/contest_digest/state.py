@@ -48,6 +48,14 @@ class State:
     def was_moved(self, key: str) -> bool:
         return bool(self.items.get(key, {}).get("moved"))
 
+    def is_both(self, key: str) -> bool:
+        """융합 공모전이라 아직 다른 트랙에도 보내야 하는 건."""
+        return bool(self.items.get(key, {}).get("both"))
+
+    def sent_in(self, key: str) -> list[str]:
+        """이미 발송한 트랙 목록 (융합 공모전은 두 트랙에 차례로 발송된다)."""
+        return list(self.items.get(key, {}).get("sent_in") or [])
+
     def fingerprints(self) -> dict:
         """중복 판정용으로 저장된 모든 건(처리·대기)의 키 → Fingerprint."""
         from .filters import Fingerprint
@@ -63,7 +71,8 @@ class State:
 
     def mark(self, key: str, today: date, apply_end: date | None, issue_number: int | None,
              title: str | None = None, is_it: bool | None = None, status: str | None = None,
-             listing: Listing | None = None, moved: bool = False, host: str | None = None) -> None:
+             listing: Listing | None = None, moved: bool = False, host: str | None = None,
+             both: bool = False) -> None:
         prev = self.items.get(key, {})
         item = {
             "title": title,
@@ -76,6 +85,15 @@ class State:
         }
         if moved or prev.get("moved"):
             item["moved"] = True
+        if item["status"] == PENDING and (both or prev.get("both")):
+            # 이월·재시도로 pending에 남는 동안 융합 표시를 잃지 않게 한다
+            item["both"] = True
+        sent_in = list(prev.get("sent_in") or [])
+        if item["status"] == "sent":
+            track = "it" if is_it else "non-it"
+            sent_in += [] if track in sent_in else [track]
+        if sent_in:
+            item["sent_in"] = sent_in
         if item["status"] == PENDING and listing:
             item["listing"] = {**listing.__dict__,
                                "apply_end": listing.apply_end.isoformat() if listing.apply_end else None}

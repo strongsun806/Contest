@@ -38,6 +38,7 @@ env:
   CLASSIFIER_FALLBACK_MODEL: ${{ vars.CLASSIFIER_FALLBACK_MODEL }}
   CLASSIFY_LOW: ${{ vars.CLASSIFY_LOW }}
   CLASSIFY_HIGH: ${{ vars.CLASSIFY_HIGH }}
+  CLASSIFY_MIXED: ${{ vars.CLASSIFY_MIXED }}
   MAX_ITEMS: ${{ inputs.max_items }}
 
 jobs:

@@ -86,10 +86,11 @@ needs_review: bool         review_reasons: [str]
 | 2차 | 0.3<p<0.5(애매)이거나 Jev 호출이 실패한 건만 `qwen/qwen3.7-flash`에 40건씩 배치로 다시 판정 |
 | 3차 | 2차에서도 답이 없으면 키워드 규칙 |
 | 기준 | AI·데이터·SW개발·해커톤·보안·디지털 서비스 기획은 IT. AI 도구로 만드는 영상·이미지 창작 공모는 비IT |
-| 기록 | 분류 결과는 `state.json`의 `it`에 남겨 재분류하지 않음. IT 트랙에서 VLM이 비IT 분야 category를 고르면 Non-IT 트랙으로 넘김(반대 방향은 없음) |
+| 융합 | IT와 비IT 전문 분야(금융·경영·디자인 등)가 함께 핵심이거나 애매한 건은 두 트랙 모두 발송. Jev에 `mixed` 질문을 함께 던져 p≥`CLASSIFY_MIXED`(0.5)면 융합, 2차 LLM은 `mixed` 필드, 키워드 규칙은 IT 키워드+`MIXED_KEYWORDS`. 상세(VLM)와 목록 판정이 엇갈려도 융합으로 처리. state에 `both`·`sent_in` 기록 |
+| 기록 | 분류 결과는 `state.json`의 `it`에 남겨 재분류하지 않음. IT 트랙에서 VLM이 비IT로 판단(is_it=false, 비IT category)하면 Non-IT 트랙으로 넘김 |
 | 공모전 범위 (IT·Non-IT 공통) | 단발성 이벤트(지속 활동 불필요)이면서 수상·상금·수고비 등 보상이 명확한 경진대회·공모전만 본문에 올림. 서포터즈·기자단 등은 제목 키워드로 추출 전에, 나머지는 VLM `is_competition=false`로 걸러 본문 맨 아래 접힌 토글(`<details>`)에 링크만 남김 (2026-10-27) |
 | 실행 | classify → publish-it → publish-non-it 세 job을 순서대로. 트랙별 VLM 상한 50건이라 job별 timeout을 둠 |
-| 중복 | 정규화 제목(괄호 부연·기호 제거)이 같으면 소스가 달라도 1건만 발송 |
+| 중복 | 정규화 제목(괄호 부연·기호 제거)이 같으면 소스가 달라도 1건만 발송. `[2026 서울관광 프롬프톤] 참가자모집`처럼 괄호 밖이 꼬리말뿐이면 괄호 안을 핵심 제목으로 씀 |
 | JSON 출력 | 모델이 structured outputs를 지원하면 json_schema, 아니면 json_object + 프롬프트 스키마 (`qwen/qwen3.7-flash`가 여기에 해당 [사실: /models 조회]) |
 
 **모델 선택 근거 [사실: 2026-10-27 실측]**

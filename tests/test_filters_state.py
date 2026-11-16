@@ -91,6 +91,11 @@ def test_cross_source_fuzzy_dedupe(today):
                            fp("모두의 KISA 공모 - KISA에게 바란다 모두의 KISA", "한국인터넷진흥원"))
     # 숫자만 다른 제목은 별개
     assert not is_same_contest(fp("제목 900001"), fp("제목 900002"))
+    # 제목 본체가 괄호 안에 있고 밖에는 '참가자모집'만 있는 경우 (Issue #5)
+    assert is_same_contest(fp("[2026 서울관광 프롬프톤] 참가자모집", "서울관광재단", source="linkareer"),
+                           fp("2026 서울관광 프롬프톤", "서울관광재단", source="wevity"))
+    assert not is_same_contest(fp("[2026 서울관광 프롬프톤] 참가자모집", "서울관광재단", source="linkareer"),
+                               fp("[2026 부산 AI 해커톤] 참가자모집", "부산정보산업진흥원", source="wevity"))
     # 같은 소스에서 마감이 다르면 별개
     assert not is_same_contest(fp("칠곡 숏폼 공모전"), fp("칠곡 숏폼 영상 공모전", end=today + timedelta(days=5)))
     # 같은 기관·같은 마감의 다른 프로그램은 별개 (주최명이 제목 대부분인 경우)

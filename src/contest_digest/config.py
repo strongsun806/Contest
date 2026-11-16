@@ -29,6 +29,12 @@ IT_KEYWORDS = [
     "로봇", "생성형", "머신러닝", "딥러닝", "오픈소스", "아이디어톤", "자율주행", "반도체",
 ]
 
+# IT 키워드와 함께 나오면 융합 공모전으로 보고 IT·Non-IT 두 트랙에 모두 보내는 비IT 전문 분야 키워드
+MIXED_KEYWORDS = [
+    "재무", "금융", "투자", "자산", "회계", "세무", "보험", "경영", "마케팅", "광고", "브랜드", "디자인",
+    "영상", "사진", "웹툰", "일러스트", "음악", "문학", "에세이", "정책", "법률", "의료",
+]
+
 # 이 카테고리만으로 구성된 공모전은 키워드가 없어도 IT로 본다
 IT_ONLY_CATEGORIES = {"웹/모바일/IT", "웹/모바일/플래시", "게임/소프트웨어", "과학/공학", "학술", "기타"}
 
@@ -54,6 +60,8 @@ class Settings:
     # 초기값은 IT를 넓게 통과시키는 느슨한 기준. 품질을 보며 변수로 올린다.
     classify_low: float = field(default_factory=lambda: float(_env("CLASSIFY_LOW", "0.3")))
     classify_high: float = field(default_factory=lambda: float(_env("CLASSIFY_HIGH", "0.5")))
+    # Jev가 준 융합 확률이 이 값 이상이면 두 트랙 모두에 보낸다
+    classify_mixed: float = field(default_factory=lambda: float(_env("CLASSIFY_MIXED", "0.5")))
     classify_batch: int = field(default_factory=lambda: int(_env("CLASSIFY_BATCH", "40")))
     max_items: int = field(default_factory=lambda: int(_env("MAX_ITEMS", "50")))
     max_posters: int = field(default_factory=lambda: int(_env("MAX_POSTERS", "2")))
