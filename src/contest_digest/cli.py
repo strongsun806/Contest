@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
+from pathlib import Path
 import sys
 
 from .config import TRACKS, Settings, today_kst
@@ -58,6 +60,8 @@ def _publish(settings: Settings, result) -> int | None:
     issue = None
     if result.contests:
         issue = create_issue(settings.github_token, repo, result.title, result.body, [settings.issue_label])
+        if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
+            Path("manual-published.txt").write_text(f"{repo}#{issue}\n")
         logging.info("[%s] %s Issue #%d 생성", result.track, repo, issue)
         try:
             lock_issue(settings.github_token, repo, issue)

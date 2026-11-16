@@ -5,7 +5,7 @@ name: weekly-digest
 # 상태 파일은 artifact로 다음 job에 넘긴다 (dry-run에서도 분류 결과를 이어받기 위해).
 on:
   schedule:
-    - cron: "47 23 * * 0" # 월요일 08:47 KST (UTC 일요일 23:47, 정각 회피)
+    - cron: "47 20 * * 0" # 월요일 05:47 KST (UTC 일요일 20:47, 정각 회피)
   workflow_dispatch:
     inputs:
       dry_run:
@@ -20,6 +20,7 @@ on:
 # Issue는 별도 저장소(vars.ISSUE_REPO, vars.NON_IT_ISSUE_REPO)에 ISSUE_TOKEN으로 발행하므로 이 저장소에는 상태 커밋 권한만 필요
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: weekly-digest
@@ -40,7 +41,41 @@ env:
   MAX_ITEMS: ${{ inputs.max_items }}
 
 jobs:
+  check-week:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - uses: actions/github-script@v7
+        id: check
+        with:
+          script: |
+            let skip = false;
+            if (context.eventName === 'schedule') {
+              const now = new Date();
+              const monday = new Date(now.getTime() + 9 * 3600000);
+              monday.setUTCHours(0, 0, 0, 0);
+              monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);
+              const start = monday.getTime() - 9 * 3600000;
+              for await (const response of github.paginate.iterator(
+                github.rest.actions.listArtifactsForRepo,
+                { ...context.repo, per_page: 100 }
+              )) {
+                skip = response.data.some(a =>
+                  a.name.startsWith('manual-published-') && !a.expired &&
+                  new Date(a.created_at).getTime() >= start &&
+                  new Date(a.created_at).getTime() <= now.getTime() &&
+                  a.workflow_run?.head_branch === context.ref.replace('refs/heads/', '')
+                );
+                if (skip) break;
+              }
+            }
+            core.setOutput('skip', String(skip));
+            if (skip) core.notice('이번 주 수동 이슈 발행 기록이 있어 cron을 건너뜁니다.');
+
   classify:
+    needs: check-week
+    if: needs.check-week.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -95,6 +130,14 @@ jobs:
         with:
           name: state-it
           path: data/state.json
+      - name: Record manual publication
+        if: ${{ always() && github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-published-${{ github.run_id }}-${{ github.job }}-${{ github.run_attempt }}
+          path: manual-published.txt
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Commit state
         if: env.DRY_RUN != 'true'
         run: |
@@ -132,6 +175,14 @@ jobs:
           else
             python -m contest_digest run --track non-it --no-classify
           fi
+      - name: Record manual publication
+        if: ${{ always() && github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-published-${{ github.run_id }}-${{ github.job }}-${{ github.run_attempt }}
+          path: manual-published.txt
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Commit state
         if: env.DRY_RUN != 'true'
         run: |

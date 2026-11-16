@@ -25,7 +25,7 @@ IT·데이터·AI 공모전을 매주 모아 VLM으로 구조화하고, GitHub I
 ### 발송
 | 항목 | 결정 |
 |---|---|
-| 주기 | 주 1회, 월요일 09시경 KST → cron `47 23 * * 0` (UTC 일요일 23:47, 비정각) |
+| 주기 | 주 1회, 월요일 05:47 KST → cron `47 20 * * 0` (UTC 일요일 20:47, 비정각) |
 | Issue 단위 | 실행 1회당 다이제스트 1건. 제목은 `[공모전 주간] YYYY-MM-DD (N건)` |
 | 구성 | ① 마감임박(7일 이내) ② 나머지(마감일 오름차순). 각 항목에 확인 필요 표시. 운영 메모(이월 건수·수집 실패)와 구독 안내 문구는 본문에 넣지 않음 — 수집 실패는 워크플로 로그로 확인 |
 | 신규 0건 | Issue를 만들지 않음 (로그만 남김) |
@@ -146,3 +146,5 @@ needs_review: bool         review_reasons: [str]
 - `cli.py`에 `check-model` 추가
 - `scripts/eval_golden.py`, `tests/golden/` 추가
 - 워크플로 권한: `issues: write`, `contents: write`. `concurrency` 그룹으로 중복 실행 방지. `workflow_dispatch` 입력은 `dry_run`(bool)·`max_items`
+
+- 같은 KST 주(월요일 00:00 시작)에 수동 실행으로 실제 이슈가 발행되면 예약 실행을 건너뛴다. dry-run 및 신규 0건은 제외한다.
