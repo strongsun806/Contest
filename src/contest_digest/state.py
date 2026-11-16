@@ -85,7 +85,8 @@ class State:
         }
         if moved or prev.get("moved"):
             item["moved"] = True
-        if both and item["status"] == PENDING:
+        if item["status"] == PENDING and (both or prev.get("both")):
+            # 이월·재시도로 pending에 남는 동안 융합 표시를 잃지 않게 한다
             item["both"] = True
         sent_in = list(prev.get("sent_in") or [])
         if item["status"] == "sent":

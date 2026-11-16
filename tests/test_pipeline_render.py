@@ -256,6 +256,10 @@ def test_mixed_contest_sent_to_both_tracks(http, today):
     state = State()
     it = Listing("wevity", "900001", "AI 재무설계 콘테스트", "https://www.wevity.com/?c=find&s=1&gbn=view&ix=900001")
     state.mark(it.key, today, None, None, title=it.title, is_it=True, status="pending", listing=it, both=True)
+    s = Settings()
+    s.max_items = 0  # 이월돼도 융합 표시가 유지돼야 한다
+    save_marks(state, process(s, http, state, today, "it", use_llm=False), today, issue=None)
+    assert state.is_both(it.key)
     r = process(Settings(), http, state, today, "it", use_llm=False)
     assert [c.key for c in r.contests] == ["wevity:900001"]
     save_marks(state, r, today, issue=1)
