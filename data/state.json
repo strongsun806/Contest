@@ -4245,17 +4245,11 @@
       "first_seen": "2026-11-23",
       "apply_end": "2026-12-04",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "364594",
-        "title": "2027 MOBIS Robotics Challenge 현대모비스 로보틱스 경진대회",
-        "url": "https://linkareer.com/activity/364594",
-        "host": "현대모비스",
-        "apply_end": "2026-12-04",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:364627": {
       "title": "2026년 대국민 경륜·경정 건전화 공모전",
@@ -4389,17 +4383,11 @@
       "first_seen": "2026-11-23",
       "apply_end": "2026-11-23",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "364730",
-        "title": "with Gemini 아이디어 공모전",
-        "url": "https://linkareer.com/activity/364730",
-        "host": "Team_Gemini 울산대",
-        "apply_end": "2026-11-23",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:364763": {
       "title": "듀라텍스 몽그리귀마개 AI 사진, 영상 공모전",
@@ -4461,17 +4449,11 @@
       "first_seen": "2026-11-23",
       "apply_end": "2026-12-14",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "364817",
-        "title": "2026 국가시범도시 AI 아이디어 · 기술 공모전",
-        "url": "https://linkareer.com/activity/364817",
-        "host": "국토교통부",
-        "apply_end": "2026-12-14",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:364818": {
       "title": "2026 대전광역시 청소년지도사 정책 아이디어 공모전",
@@ -4533,17 +4515,11 @@
       "first_seen": "2026-11-23",
       "apply_end": "2026-11-28",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "364831",
-        "title": "TripPups AI Game Hackathon 2026",
-        "url": "https://linkareer.com/activity/364831",
-        "host": "Trip-Pups",
-        "apply_end": "2026-11-28",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:364832": {
       "title": "제16회 비정규노동 수기공모전",
@@ -4749,17 +4725,11 @@
       "first_seen": "2026-11-23",
       "apply_end": "2027-01-10",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "365130",
-        "title": "2027 제 2회 Superb AI X BDAI Vision AI 해커톤",
-        "url": "https://linkareer.com/activity/365130",
-        "host": "비디에이아이(BDAI)",
-        "apply_end": "2027-01-10",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:365135": {
       "title": "[부산정보산업진흥원] 2026 뮤직텔링 부산 공모전",
@@ -5199,17 +5169,11 @@
       "first_seen": "2026-11-23",
       "apply_end": "2026-11-29",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "365635",
-        "title": "[울산] 코딩 몰라도 OK, 1박 2일 AI 해커톤 INNO-CODER (총상금 200만 원·무료)",
-        "url": "https://linkareer.com/activity/365635",
-        "host": "팀모노리스",
-        "apply_end": "2026-11-29",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:365700": {
       "title": "제 3회 스마트그리드 아이디어 공모전",
@@ -5217,27 +5181,24 @@
       "first_seen": "2026-11-23",
       "apply_end": "2026-12-24",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "365700",
-        "title": "제 3회 스마트그리드 아이디어 공모전",
-        "url": "https://linkareer.com/activity/365700",
-        "host": "한국스마트그리드협회",
-        "apply_end": "2026-12-24",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:365707": {
       "title": "[월드 AI 사운드 마스터즈 협회] 제1회 제주어 AI 음악 경진대회",
       "host": "월드 AI 사운드 마스터즈 협회",
       "first_seen": "2026-11-23",
       "apply_end": "2026-12-20",
-      "it": true,
+      "it": false,
       "status": "pending",
       "issue": null,
-      "both": true,
+      "moved": true,
+      "sent_in": [
+        "it"
+      ],
       "listing": {
         "source": "linkareer",
         "id": "365707",
@@ -5325,10 +5286,13 @@
       "host": "밀양시청",
       "first_seen": "2026-11-23",
       "apply_end": "2026-12-11",
-      "it": true,
+      "it": false,
       "status": "pending",
       "issue": null,
-      "both": true,
+      "moved": true,
+      "sent_in": [
+        "it"
+      ],
       "listing": {
         "source": "linkareer",
         "id": "365775",
@@ -5381,17 +5345,11 @@
       "first_seen": "2026-11-23",
       "apply_end": "2026-11-29",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "365966",
-        "title": "일상 속 아이디어를 AI로 웹·앱 서비스로! INNO-CODER AI HACKATHON",
-        "url": "https://linkareer.com/activity/365966",
-        "host": "운당나눔재단",
-        "apply_end": "2026-11-29",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:365981": {
       "title": "2026 포항 MICE 창업 해커톤",
@@ -5399,17 +5357,11 @@
       "first_seen": "2026-11-23",
       "apply_end": "2026-11-30",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "365981",
-        "title": "2026 포항 MICE 창업 해커톤",
-        "url": "https://linkareer.com/activity/365981",
-        "host": "포항시",
-        "apply_end": "2026-11-30",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:365986": {
       "title": "2026 통합데이터플랫폼(원-윈도우) 활용 아이디어 기획 공모전",
@@ -5417,17 +5369,11 @@
       "first_seen": "2026-11-23",
       "apply_end": "2026-11-30",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "linkareer",
-        "id": "365986",
-        "title": "2026 통합데이터플랫폼(원-윈도우) 활용 아이디어 기획 공모전",
-        "url": "https://linkareer.com/activity/365986",
-        "host": "과학기술정보통신부",
-        "apply_end": "2026-11-30",
-        "categories": []
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "linkareer:366054": {
       "title": "2027 에몬스 장학생 [19기] 모집",
@@ -7394,10 +7340,11 @@
       "title": "2027 지역 창업 솔버톤 - AI가 깨우는 지역의 불씨",
       "host": "서울대학교 대학연대 지역인재양성사업단(IITD)",
       "first_seen": "2026-11-23",
-      "apply_end": "2026-11-29",
-      "it": true,
+      "apply_end": "2026-11-28",
+      "it": false,
       "status": "pending",
       "issue": null,
+      "moved": true,
       "listing": {
         "source": "wevity",
         "id": "112402",
@@ -7514,11 +7461,14 @@
       "title": "한국어촌어항공단 2026년 FiPA 3S 아이디어 공모전",
       "host": "한국어촌어항공단",
       "first_seen": "2026-11-23",
-      "apply_end": "2026-12-04",
-      "it": true,
+      "apply_end": "2026-12-03",
+      "it": false,
       "status": "pending",
       "issue": null,
-      "both": true,
+      "moved": true,
+      "sent_in": [
+        "it"
+      ],
       "listing": {
         "source": "wevity",
         "id": "112433",
@@ -7575,21 +7525,13 @@
       "title": "2026년 서울교육 AI 활용 공모전",
       "host": "서울특별시동부교육지원청",
       "first_seen": "2026-11-23",
-      "apply_end": "2026-12-12",
+      "apply_end": "2026-12-11",
       "it": true,
-      "status": "pending",
-      "issue": null,
-      "listing": {
-        "source": "wevity",
-        "id": "112438",
-        "title": "2026년 서울교육 AI 활용 공모전",
-        "url": "https://www.wevity.com/?c=find&s=1&gbn=view&ix=112438",
-        "host": "서울특별시동부교육지원청",
-        "apply_end": "2026-12-12",
-        "categories": [
-          "웹/모바일/IT"
-        ]
-      }
+      "status": "sent",
+      "issue": 6,
+      "sent_in": [
+        "it"
+      ]
     },
     "wevity:112442": {
       "title": "2026년 제19회 시민 시 낭송 대회",
@@ -7855,11 +7797,14 @@
       "title": "제1회 서울국제AI광고영상제 (SIADAFF)",
       "host": "(주)케이미디어진흥원",
       "first_seen": "2026-11-23",
-      "apply_end": "2027-01-08",
-      "it": true,
+      "apply_end": "2027-01-07",
+      "it": false,
       "status": "pending",
       "issue": null,
-      "both": true,
+      "moved": true,
+      "sent_in": [
+        "it"
+      ],
       "listing": {
         "source": "wevity",
         "id": "112508",
